@@ -1,0 +1,12 @@
+services:
+  ustoearth:
+    image: ustoearth/ustoearth:latest
+    env_file:
+      - .env
+    ports:
+      - "8000:9000"
+    environment:
+      - PROD_DB_URL=${PROD_DB_URL}
+      - PROD_DB_USER=${PROD_DB_USER}
+      - PROD_DB_PASSWORD=${PROD_DB_PASSWORD}
+      - TZ=Asia/Seoul

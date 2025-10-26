@@ -1,0 +1,105 @@
+spring:
+  application:
+    name: U2E
+  profiles:
+    group:
+      local: db-local, port-local, common
+      prod: db-prod, port-prod, common
+    active: local
+
+jwt:
+  secret: mysecretkey123mysecretkey123mysecretkey123mysecretkey123mysecretkey123mysecretkey123
+  expiration: 3600000
+---
+
+# 로컬 DB
+spring:
+  config:
+    activate:
+      on-profile: db-local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/U2E
+    username: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        
+  docker:
+    compose:
+      enabled: false
+
+---
+#prod DB
+spring:
+  config:
+    activate:
+      on-profile: db-prod
+  datasource:
+    url: ${PROD_DB_URL}
+    username: ${PROD_DB_USER}
+    password: ${PROD_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  docker:
+    compose:
+      enabled: true  # prod ???? Docker Compose ???
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port-prod
+
+server:
+  port: 9000
+  servlet:
+    context-path: /
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port-local
+
+server:
+  port: 8000
+  servlet:
+    context-path: /
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
