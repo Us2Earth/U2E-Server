@@ -1,10 +1,6 @@
 name: CI with Gradle & Sonar
 
 on:
-  push:
-    branches:
-      - 'main'
-      - 'develop'
   pull_request:
     branches:
       - 'main'
@@ -33,7 +29,7 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/action s/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
