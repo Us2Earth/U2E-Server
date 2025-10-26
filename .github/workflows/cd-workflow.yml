@@ -25,7 +25,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           server-id: github
-        setting-path: ${{ github.workspace }}
+          setting-path: ${{ github.workspace }}
 
       - name: 🐘 Cache Gradle dependencies
         uses: actions/cache@v3
