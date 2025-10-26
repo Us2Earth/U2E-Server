@@ -3,7 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'jacoco'
-	id 'org.sonarqube' version '6.0.1.4882'
+	id 'org.sonarqube' version '5.0.0.4638'
 }
 
 group = 'Konkuk'
@@ -152,4 +152,8 @@ tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
 
 tasks.named('check') {
 	dependsOn tasks.named('jacocoTestCoverageVerification')
+}
+
+tasks.named('sonarqube') {
+	dependsOn tasks.jacocoTestReport
 }
