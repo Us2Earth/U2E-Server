@@ -7,12 +7,14 @@ import Konkuk.U2E.domain.user.exception.DuplicateUserException;
 import Konkuk.U2E.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static Konkuk.U2E.global.response.status.BaseExceptionResponseStatus.DUPLICATE_USER;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 class UserServiceTest {
 
     @Test
@@ -63,7 +65,7 @@ class UserServiceTest {
         // when & then
         assertThatThrownBy(() -> sut.signupAndLogin(req))
                 .isInstanceOf(DuplicateUserException.class)
-                .hasFieldOrPropertyWithValue("status", DUPLICATE_USER);
+                .hasFieldOrPropertyWithValue("message", DUPLICATE_USER.getMessage());
 
         verify(repo).findUserByName("alice");
         verify(repo, never()).save(any(User.class));
