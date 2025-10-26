@@ -35,8 +35,6 @@ jobs:
         run: chmod +x ./gradlew
         # working-directory: ./U2E  # 서브모듈/하위 디렉터리일 경우 주석 해제 후 경로 지정
 
-      # 테스트 실행 + JaCoCo 리포트 + Sonar 분석
-      # - jacocoTestReport는 xml 리포트를 생성해야 하며, build.gradle 설정 필요(아래 3번 참고)
       - name: Build, Test, Coverage, Sonar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # PR 데코레이션용(자동 제공, Secrets에 별도 추가 불필요)
