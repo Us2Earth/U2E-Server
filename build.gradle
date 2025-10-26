@@ -32,7 +32,7 @@ sonarqube {
 		property "sonar.organization", "Us2Earth"
 		property "sonar.java.coveragePlugin", "jacoco"
 		property "sonar.coverage.jacoco.xmlReportPaths",
-				layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+				layout.buildDirectory.file("reports/test/jacocoTestReport.xml")
 						.get().asFile.absolutePath
 	}
 }
