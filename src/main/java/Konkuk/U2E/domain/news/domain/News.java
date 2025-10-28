@@ -43,6 +43,29 @@ public class News extends BaseEntity {
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @Lob
+    @Column(name = "ai_solution", columnDefinition = "LONGTEXT")
+    private String aiSolution;
+
+    @Column(name = "ai_related1_title", length = 300)
+    private String aiRelated1Title;
+    @Column(name = "ai_related1_url", columnDefinition = "TEXT")
+    private String aiRelated1Url;
+
+    @Column(name = "ai_related2_title", length = 300)
+    private String aiRelated2Title;
+    @Column(name = "ai_related2_url", columnDefinition = "TEXT")
+    private String aiRelated2Url;
+
+    @Column(name = "ai_related3_title", length = 300)
+    private String aiRelated3Title;
+    @Column(name = "ai_related3_url", columnDefinition = "TEXT")
+    private String aiRelated3Url;
+
+    @Lob
+    @Column(name = "ai_summary", columnDefinition = "LONGTEXT")
+    private String aiSummary;
+
     @Builder
     public News(String newsUrl, String imageUrl, String newsTitle, String newsBody, LocalDate newsDate, List<Climate> climateList) {
         this.newsUrl = newsUrl;
@@ -56,5 +79,19 @@ public class News extends BaseEntity {
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.setNews(this);
+    }
+
+    public void applyAiResult(String solution,
+                              String t1, String u1,
+                              String t2, String u2,
+                              String t3, String u3) {
+        this.aiSolution = solution;
+        this.aiRelated1Title = t1; this.aiRelated1Url = u1;
+        this.aiRelated2Title = t2; this.aiRelated2Url = u2;
+        this.aiRelated3Title = t3; this.aiRelated3Url = u3;
+    }
+
+    public void applyAiSummary(String summary) {
+        this.aiSummary = summary;
     }
 }
