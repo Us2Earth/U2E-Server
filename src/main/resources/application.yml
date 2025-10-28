@@ -99,6 +99,15 @@ spring:
     activate:
       on-profile: common
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
 springdoc:
   swagger-ui:
     enabled: true
