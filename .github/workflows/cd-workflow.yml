@@ -1,4 +1,4 @@
-name: CD with Gradle and Docker
+name: CD with Gradle and Docker (Blue-Green)
 
 on:
   push:
@@ -18,15 +18,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 코드 체크아웃
       - uses: actions/checkout@v4
-      - name: ☕️ set up JDK 21        # 프로젝트의 java 버전에 맞추어 설정
+
+      # JDK 설정 (Java 21)
+      - name: ☕️ Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
           server-id: github
-          setting-path: ${{ github.workspace }}
+          settings-path: ${{ github.workspace }}
 
+      # Gradle 캐시
       - name: 🐘 Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -37,25 +41,27 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: 👏🏻 grant execute permission for gradlew
+      # gradlew 실행 권한 부여
+      - name: 👏🏻 Grant execute permission for gradlew
         run: chmod +x gradlew
-#        working-directory: ./U2E
 
-      - name: 🐘 build with Gradle (without test)
+      # Gradle 빌드 (테스트 제외)
+      - name: 🐘 Build with Gradle (without test)
         run: ./gradlew clean build -x test --stacktrace
-#        working-directory: ./U2E
 
+      # Docker 이미지 빌드 & 푸시
       - name: 🐳 Docker build & push
-        run:  |
+        run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
-#        working-directory: ./U2E
 
+      # Actions 서버의 Public IP 획득
       - name: 🫴🏻 Get Public IP
         id: ip
         uses: haythem/public-ip@v1.3
 
+      # AWS 자격증명 설정
       - name: 🪪 Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -63,51 +69,52 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'ap-northeast-2'
 
+      # EC2 보안그룹에 임시로 GitHub Actions IP 추가 (SSH 허용)
       - name: ➕ Add GitHub Actions IP
         run: |
           aws ec2 authorize-security-group-ingress \
-              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
-              --protocol tcp \
-              --port 22 \
-              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-      - name: ✉️ Send docker-compose.yml
+      # docker-compose.yml + deploy.sh 파일을 EC2로 전송
+      - name: ✉️ Send docker-compose.yml & deploy.sh
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
-          source: "./docker-compose.yml"
+          source: "./docker-compose.yml,./deploy.sh"
           target: "/home/ec2-user/"
 
-      - name: 🚀 deploy to server
+      # EC2에서 Blue-Green 배포 실행
+      - name: 🚀 Deploy to server (Blue-Green)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
-          envs: GITHUB_SHA
           script: |
-            echo "🗂️ Change Directory to EC2 Root"
-            cd /home/ec2-user/U2E
-            
-            echo "✋🏻Stopping existing container and Cleaning up old images"
-            sudo docker-compose down --rmi all
-            
-            sudo docker ps -a
-            
-            echo "🥳 Pulling new image"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
-            
-            echo "🌱 Starting new container"
-            sudo docker-compose up -d
+            echo "🗂️ Move to EC2 home directory"
+            cd /home/ec2-user
 
+            echo "🔧 Set execute permission for deploy.sh"
+            chmod +x ./deploy.sh
+
+            echo "🧾 Check docker compose version"
+            docker compose version || docker-compose --version
+
+            echo "🚀 Run Blue-Green Deployment Script"
+            ./deploy.sh
+
+      # 배포 후 보안그룹 SSH 규칙 제거
       - name: ❌ Remove GitHub Actions IP
         if: always()
         run: |
           aws ec2 revoke-security-group-ingress \
-              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
-              --protocol tcp \
-              --port 22 \
-              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
