@@ -52,7 +52,7 @@ public class PinListService {
             ClimateProblem climateProblem = ClimateProblem.fromString(climate);
             return GetPinListResponse.of(getPinListByClimate(climateProblem));
         }
-        if (region == null && climate == null && newsId != null) {
+        if (region == null && climate == null) {
             return GetPinListResponse.of(getPinListByNewsId(newsId));
         }
 
