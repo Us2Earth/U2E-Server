@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
+	id 'org.sonarqube' version '5.0.0.4638'
 }
 
 group = 'Konkuk'
@@ -23,6 +25,17 @@ repositories {
 	mavenCentral()
 }
 
+sonarqube {
+	properties {
+		property "sonar.projectKey", "Us2Earth_U2E-Server"
+		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.organization", "us2earth"
+		property "sonar.java.coveragePlugin", "jacoco"
+		property "sonar.coverage.jacoco.xmlReportPaths",
+				layout.buildDirectory.file("reports/test/jacocoTestReport.xml").get().asFile.absolutePath
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -34,24 +47,120 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//	jwt
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// WebClient
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
-	implementation 'com.fasterxml.jackson.core:jackson-annotations'
-	implementation 'com.fasterxml.jackson.core:jackson-core'
-  
-	// 헬스 체크 api 를 사용하기 위한 Actuator 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+	testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
+	testImplementation 'org.mockito:mockito-core:5.12.0'
+	testImplementation 'org.assertj:assertj-core:3.26.0'
+
+    // WebClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    // 헬스 체크 api 를 사용하기 위한 Actuator 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+
+jacoco {
+	toolVersion = "0.8.12"
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy tasks.jacocoTestReport
+}
+
+tasks.named('jacocoTestReport', JacocoReport) {
+	dependsOn(tasks.test)
+
+	def mainClasses = files(sourceSets.main.output).asFileTree.matching {
+		exclude(
+				"**/generated/**",
+				"**/build/**",
+				"**/*application*",
+				"**/*config*",
+				"**/*dto*",
+				"**/*request*",
+				"**/*response*",
+				"**/generated/querydsl/**",
+				"**/Q*.*"
+		)
+	}
+
+	additionalSourceDirs.from files(sourceSets.main.allSource.srcDirs)
+	sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
+	classDirectories.setFrom(mainClasses)
+
+	executionData.from fileTree(project.rootDir) {
+		include "**/build/jacoco/*.exec"
+	}
+
+	reports {
+		html.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("reports/test/jacocoTestReportHtml"))
+
+		xml.required.set(true)
+		xml.outputLocation.set(layout.buildDirectory.file("reports/test/jacocoTestReport.xml"))
+
+		csv.required.set(false)
+	}
+}
+
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
+	dependsOn(tasks.test)
+
+	classDirectories.setFrom(
+			files(sourceSets.main.output).asFileTree.matching {
+				exclude(
+						"**/generated/**",
+						"**/build/**",
+						"**/*application*",
+						"**/*config*",
+						"**/*dto*",
+						"**/*request*",
+						"**/*response*",
+						"**/generated/querydsl/**",
+						"**/Q*.*"
+				)
+			}
+	)
+
+	violationRules {
+		rule {
+			element = 'CLASS'
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+		}
+	}
+}
+
+tasks.named('check') {
+	dependsOn tasks.named('jacocoTestCoverageVerification')
+}
+
+tasks.named('sonarqube') {
+	dependsOn tasks.jacocoTestReport
 }
