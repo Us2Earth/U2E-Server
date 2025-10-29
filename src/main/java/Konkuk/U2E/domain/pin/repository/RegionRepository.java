@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RegionRepository extends JpaRepository<Region, Long> {
@@ -13,4 +14,7 @@ public interface RegionRepository extends JpaRepository<Region, Long> {
     //문자열을 포함하는 모든 지역을 찾는 메서드
     @Query("SELECT r FROM Region r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :region, '%'))")
     List<Region> findRegionsByName(String region);
+
+    Optional<Region> findByNameIgnoreCase(String name);
+
 }

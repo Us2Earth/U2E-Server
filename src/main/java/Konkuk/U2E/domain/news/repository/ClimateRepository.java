@@ -21,4 +21,6 @@ public interface ClimateRepository extends JpaRepository<Climate, Long> {
             "FROM Climate c WHERE c.news = :news AND c.climateProblem = :climateProblem")
     boolean existsByNewsAndClimateProblem(@Param("news") News news,
                                           @Param("climateProblem") ClimateProblem climateProblem);
+
+    void deleteAllByNews(News news);
 }
