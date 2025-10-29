@@ -13,11 +13,13 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("JwtUtil 단위 테스트")
 class JwtUtilTest {
 
-    private JwtUtil jwtUtil = new JwtUtil("abcdefghakjfnjklafljkaklfjaslkdfjlkjkljklafjkkljflkaflksjklijklmnopqrstuvwxyz");
+    private final JwtUtil jwtUtil = new JwtUtil("abcdefghakjfnjklafljkaklfjaslkdfjlkjkljklafjkkljflkaflksjklijklmnopqrstuvwxyz");
 
     @Test
     @DisplayName("토큰 생성/검증 - OK (username 클레임 반환)")
     void generate_and_validate_ok() {
+        ReflectionTestUtils.setField(jwtUtil, "expirationMs", 3_600_000L); // 1시간
+
         // when
         String token = jwtUtil.generateAccessToken("tester");
 
