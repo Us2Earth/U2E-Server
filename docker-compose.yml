@@ -1,12 +1,28 @@
 services:
-  ustoearth:
+  u2e-blue:
     image: ustoearth/ustoearth:latest
+    container_name: u2e-blue
+    restart: always
     env_file:
       - .env
-    ports:
-      - "8000:9000"
     environment:
+      - TZ=Asia/Seoul
       - PROD_DB_URL=${PROD_DB_URL}
       - PROD_DB_USER=${PROD_DB_USER}
       - PROD_DB_PASSWORD=${PROD_DB_PASSWORD}
+    ports:
+      - "8081:9000"   # host 8081 -> container 9000 (blue)
+
+  u2e-green:
+    image: ustoearth/ustoearth:latest
+    container_name: u2e-green
+    restart: always
+    env_file:
+      - .env
+    environment:
       - TZ=Asia/Seoul
+      - PROD_DB_URL=${PROD_DB_URL}
+      - PROD_DB_USER=${PROD_DB_USER}
+      - PROD_DB_PASSWORD=${PROD_DB_PASSWORD}
+    ports:
+      - "8082:9000"   # host 8082 -> container 9000 (green)
