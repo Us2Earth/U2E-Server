@@ -32,7 +32,14 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
      * 90000 : User
      */
     DUPLICATE_USER(90000, "중복된 아이디 입니다."),
-    INVALID_ACCESS_TOKEN(90001, "유효하지 않은 액세스 토큰입니다.")
+    INVALID_ACCESS_TOKEN(90001, "유효하지 않은 액세스 토큰입니다."),
+
+    /**
+     * 100000 : External API (Gemini)
+     */
+    GEMINI_CALL_FAILED(100000, "Gemini API 호출에 실패했습니다."),
+    GEMINI_INVALID_RESPONSE(100001, "Gemini 응답 파싱에 실패했습니다."),
+    GEMINI_MISSING_API_KEY(100002, "Gemini API Key가 설정되지 않았습니다.")
     ;
 
     private final boolean success = false;
