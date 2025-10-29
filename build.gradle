@@ -72,93 +72,76 @@ dependencies {
 }
 
 test {
+	jacoco {
+		destinationFile = file("$buildDir/jacoco/test.exec")
+	}
+
 	useJUnitPlatform()
+
+	finalizedBy 'jacocoTestReport'
 }
 
 jacoco {
 	toolVersion = "0.8.12"
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy tasks.jacocoTestReport
-}
-
-tasks.named('jacocoTestReport', JacocoReport) {
-	dependsOn(tasks.test)
-
-	def mainClasses = files(sourceSets.main.output).asFileTree.matching {
-		exclude(
-				"**/generated/**",
-				"**/build/**",
-				"**/*application*",
-				"**/*config*",
-				"**/*dto*",
-				"**/*request*",
-				"**/*response*",
-				"**/generated/querydsl/**",
-				"**/Q*.*"
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.required.set(true)   // 개발자용 HTML 보고서 생성
+		xml.required.set(true)    // SonarCloud용 XML 보고서 생성
+		csv.required.set(false)
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, excludes: [
+							"**/generated/**",
+							"**/build/**",
+							"**/*application*",
+							"**/*config*",
+							"**/*dto*",
+							"**/*request*",
+							"**/*response*",
+							"**/generated/querydsl/**",
+							"**/Q*.*"
+					])
+				})
 		)
 	}
 
-	additionalSourceDirs.from files(sourceSets.main.allSource.srcDirs)
-	sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
-	classDirectories.setFrom(mainClasses)
-
-	executionData.from fileTree(project.rootDir) {
-		include "**/build/jacoco/*.exec"
-	}
-
-	reports {
-		html.required.set(true)
-		html.outputLocation.set(layout.buildDirectory.dir("reports/test/jacocoTestReportHtml"))
-
-		xml.required.set(true)
-		xml.outputLocation.set(layout.buildDirectory.file("reports/test/jacocoTestReport.xml"))
-
-		csv.required.set(false)
-	}
+	finalizedBy 'jacocoTestCoverageVerification'
 }
 
-tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
-	dependsOn(tasks.test)
-
-	classDirectories.setFrom(
-			files(sourceSets.main.output).asFileTree.matching {
-				exclude(
-						"**/generated/**",
-						"**/build/**",
-						"**/*application*",
-						"**/*config*",
-						"**/*dto*",
-						"**/*request*",
-						"**/*response*",
-						"**/generated/querydsl/**",
-						"**/Q*.*"
-				)
-			}
-	)
+jacocoTestCoverageVerification {
 
 	violationRules {
 		rule {
-			element = 'CLASS'
+			enabled = true // 활성화
 			limit {
-				counter = 'INSTRUCTION'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
+				element = 'CLASS'
+				minimum = 0.0
 			}
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
-			}
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
-			}
+
+			excludes = [
+					"**/generated/**",
+					"**/build/**",
+					"**/*application*",
+					"**/*config*",
+					"**/*dto*",
+					"**/*request*",
+					"**/*response*",
+					"**/generated/querydsl/**",
+					"**/Q*.*"
+			]
 		}
 	}
+}
+
+tasks.register('testCoverage') {
+	group = 'verification'
+	description = 'Runs the unit tests with coverage'
+	dependsOn('test', 'jacocoTestReport', 'jacocoTestCoverageVerification')
 }
 
 tasks.named('check') {
