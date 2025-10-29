@@ -40,8 +40,8 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         if (token != null) {
-            Claims claims = jwtUtil.validateAccessToken(token);
-            request.setAttribute("username", claims.getSubject());
+            String userName = jwtUtil.validateAndGetName(token);
+            request.setAttribute("username", userName);
             log.info("사용자 {} 인증", request.getAttribute("username"));
             return true;
         }
