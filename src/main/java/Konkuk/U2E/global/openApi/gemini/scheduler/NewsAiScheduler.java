@@ -17,8 +17,8 @@ public class NewsAiScheduler {
     private final NewsRepository newsRepository;
     private final NewsAiProcessor newsAiProcessor;
 
-        @Scheduled(cron = "*/30 * * * * *", zone = "Asia/Seoul")    // 테스트용으로 30초마다 확인
-//    @Scheduled(cron = "0 30 3 * * WED", zone = "Asia/Seoul")    // 매주 수요일 03:30
+//        @Scheduled(cron = "*/30 * * * * *", zone = "Asia/Seoul")    // 테스트용으로 30초마다 확인
+    @Scheduled(cron = "0 30 3 * * WED", zone = "Asia/Seoul")    // 매주 수요일 03:30
     public void fillMissingAiFieldsDaily() {
         final int PAGE_SIZE = 50;
         int page = 0;
