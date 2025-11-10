@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:5173",
                         "https://u2e.netlify.app",
-                        "https://us2earth.click/swagger-ui/index.html"
+                        "https://us2earth.click"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
