@@ -20,19 +20,19 @@ public class WebConfig implements WebMvcConfigurer {
         this.loginUserArgumentResolver = loginUserArgumentResolver;
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 백엔드 API 경로
-                .allowedOrigins(
-                        "http://localhost:5173",
-                        "https://u2e.netlify.app",
-                        "https://us2earth.click"
-                )
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true)
-                .allowedHeaders("*")
-                .maxAge(3600);
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**") // 백엔드 API 경로
+//                .allowedOrigins(
+//                        "http://localhost:5173",
+//                        "https://u2e.netlify.app",
+//                        "https://us2earth.click"
+//                )
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowCredentials(true)
+//                .allowedHeaders("*")
+//                .maxAge(3600);
+//    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
