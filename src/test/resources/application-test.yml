@@ -28,3 +28,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
 
 
+gemini:
+  api-key: abcdefghijklmnopqrstuvwxyz
+  model: gemini-2.5-flash
+  endpoint: https://generativelanguage.googleapis.com/v1beta
