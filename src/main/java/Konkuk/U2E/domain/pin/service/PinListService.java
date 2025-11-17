@@ -105,7 +105,7 @@ public class PinListService {
         List<ClimateProblem> climateProblems = climateRepository.findClimatesByNews(latestNews).stream()
                 .map(Climate::getClimateProblem)
                 .toList();
-        return PinInfo.of(pin, pin.getRegion(), isLately, climateProblems);
+        return PinInfo.of(pin, latestNews, pin.getRegion(), isLately, climateProblems);
     }
 
     private PinInfo createPinInfo(Pin pin, ClimateProblem climateProblem) {
@@ -123,7 +123,7 @@ public class PinListService {
         List<ClimateProblem> climateProblems = climateRepository.findClimatesByNews(latestNews).stream()
                 .map(Climate::getClimateProblem)
                 .toList();
-        return PinInfo.of(pin, pin.getRegion(), isLately, climateProblems);
+        return PinInfo.of(pin, latestNews, pin.getRegion(), isLately, climateProblems);
     }
 
 }

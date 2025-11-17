@@ -1,6 +1,7 @@
 package Konkuk.U2E.domain.pin.dto.response;
 
 import Konkuk.U2E.domain.news.domain.ClimateProblem;
+import Konkuk.U2E.domain.news.domain.News;
 import Konkuk.U2E.domain.pin.domain.Pin;
 import Konkuk.U2E.domain.pin.domain.Region;
 
@@ -10,14 +11,15 @@ import java.util.Objects;
 
 public record PinInfo(
         Long pinId,
+        Long newsId,
         BigDecimal latitude,
         BigDecimal longitude,
         boolean isLately,
         String region,
         List<ClimateProblem> climateProblem
 ) {
-    public static PinInfo of(Pin pin, Region region, boolean isLately, List<ClimateProblem> climateProblemList) {
-        return new PinInfo(pin.getPinId(), region.getLatitude(), region.getLongitude(), isLately, region.getName(), climateProblemList);
+    public static PinInfo of(Pin pin, News news, Region region, boolean isLately, List<ClimateProblem> climateProblemList) {
+        return new PinInfo(pin.getPinId(), news.getNewsId(), region.getLatitude(), region.getLongitude(), isLately, region.getName(), climateProblemList);
     }
 
     @Override
