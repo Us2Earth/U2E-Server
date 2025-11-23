@@ -52,23 +52,27 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.3'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.3'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.3'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 	testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
 	testImplementation 'org.mockito:mockito-core:5.12.0'
 	testImplementation 'org.assertj:assertj-core:3.26.0'
 
-    // WebClient
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations'
-    implementation 'com.fasterxml.jackson.core:jackson-core'
+	// WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations'
+	implementation 'com.fasterxml.jackson.core:jackson-core'
 
-    // 헬스 체크 api 를 사용하기 위한 Actuator 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// 헬스 체크 api 를 사용하기 위한 Actuator 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+
+test {
+	useJUnitPlatform()
 }
 
 jacoco {
@@ -93,6 +97,9 @@ tasks.named('jacocoTestReport', JacocoReport) {
 				"**/*request*",
 				"**/*response*",
 				"**/generated/querydsl/**",
+				"**/exception/**",
+				"**/test/**",
+				"**/resolver/**",
 				"**/Q*.*"
 		)
 	}
@@ -130,6 +137,9 @@ tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
 						"**/*request*",
 						"**/*response*",
 						"**/generated/querydsl/**",
+						"**/exception/**",
+						"**/test/**",
+						"**/resolver/**",
 						"**/Q*.*"
 				)
 			}
