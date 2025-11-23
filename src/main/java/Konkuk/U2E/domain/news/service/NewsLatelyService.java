@@ -17,6 +17,7 @@ public class NewsLatelyService {
     //news의 최신 뉴스 5개를 가져오는 서비스
     public GetLatelyNewsResponse getLatelyNews() {
         return GetLatelyNewsResponse.of(newsRepository.findTop5ByOrderByNewsDateDesc().stream()
+                .filter(news -> news.getAiSummary() != null)
                 .map(newsMapperFactory.newsMappingFunction())
                 .map(LatelyNews::of)
                 .toList()

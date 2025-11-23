@@ -75,6 +75,7 @@ public class PinListService {
 
     private List<PinInfo> getPinListByClimate(ClimateProblem climateProblem) {
         return climateRepository.findNewsByClimateProblem(climateProblem).stream()
+                .filter(news -> news.getAiSummary() != null)
                 .map(newsPinRepository::findPinsByNews)
                 .flatMap(pinList -> pinList.stream()
                             .map(pin -> this.createPinInfo(pin, climateProblem))
