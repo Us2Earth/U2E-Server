@@ -13,4 +13,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     List<News> findTop5ByOrderByNewsDateDesc();
 
     Page<News> findByAiSummaryIsNull(Pageable pageable);
+
+    List<News> findTop5ByAiSummaryIsNotNullOrderByNewsDateDesc();
 }
